@@ -117,14 +117,20 @@ const getTaskCsvData = () => {
  * @param {*} date 
  * @returns 
  */
-const formatDate = (date) => {
+const formatDate = (date, split='/') => {
   
-  if(!date) return `          `;
+  if(!date) return ``;
+  if(typeof date === 'undefined') return ``;
+
+  if(typeof date === 'string'){
+    date = new Date(date)
+  }
+
 
   let year = date.getFullYear();
   let month = ("0" + (date.getMonth() + 1)).slice(-2);
   let day = ("0" + date.getDate()).slice(-2);
-  return year + "/" + month + "/" + day;
+  return year + split + month + split + day;
 }
 
 module.exports = {
