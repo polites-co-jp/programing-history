@@ -107,7 +107,7 @@ class Schedule extends TaskBase {
     let stockDate = null;
     for (let i = 0; i < this.#_tasks.length; i++) {
       //  開始予定日がないものがあれば、nullを返してそのまま終了
-      if(!this.#_tasks[i].planStartDate) return null;
+      if (!this.#_tasks[i].planStartDate) return null;
       if (
         !stockDate ||
         (this.#_tasks[i].planStartDate &&
@@ -126,7 +126,7 @@ class Schedule extends TaskBase {
     let stockDate = null;
     for (let i = 0; i < this.#_tasks.length; i++) {
       //  終了予定日がないものがあれば、nullを返してそのまま終了
-      if(!this.#_tasks[i].planEndDate) return null;
+      if (!this.#_tasks[i].planEndDate) return null;
       if (
         !stockDate ||
         (this.#_tasks[i].planEndDate && stockDate < this.#_tasks[i].planEndDate)
@@ -144,7 +144,7 @@ class Schedule extends TaskBase {
     let stockDate = null;
     for (let i = 0; i < this.#_tasks.length; i++) {
       //  開始日がないものがあれば、nullを返してそのまま終了
-      if(!this.#_tasks[i].startDate) return null;
+      if (!this.#_tasks[i].startDate) return null;
 
       if (
         !stockDate ||
@@ -163,7 +163,7 @@ class Schedule extends TaskBase {
     let stockDate = null;
     for (let i = 0; i < this.#_tasks.length; i++) {
       //  開始日がないものがあれば、nullを返してそのまま終了
-      if(!this.#_tasks[i].endDate) return null;
+      if (!this.#_tasks[i].endDate) return null;
 
       if (
         !stockDate ||
@@ -325,7 +325,6 @@ class ScheduleManager {
     let tasks = this.#parseTaskCsv(taskCsv);
     let schedules = this.#parseScheduleCsv(scheduleCsv, tasks);
     this.#_schedules = schedules;
-    // console.log(JSON.stringify(schedules));
   }
 
   /**
@@ -460,28 +459,32 @@ class ScheduleManager {
   }
 }
 
-//  CSVのデータを取得
-let scheduleCsv = df.getSheduleCsvData();
-let taskCsv = df.getTaskCsvData();
+function main() {
+  //  CSVのデータを取得
+  let scheduleCsv = df.getSheduleCsvData();
+  let taskCsv = df.getTaskCsvData();
 
-//  タスクとスケジュールを初期化
-let scheduleManager = new ScheduleManager(scheduleCsv, taskCsv);
+  //  タスクとスケジュールを初期化
+  let scheduleManager = new ScheduleManager(scheduleCsv, taskCsv);
 
-//  scheduleId:004 taskId:108　の開始日と終了日を2023/03/15に設定
-scheduleManager.setStartTask("004", "108", "2023-03-15");
-scheduleManager.setEndTask("004", "108", "2023-03-15");
+  //  scheduleId:004 taskId:108　の開始日と終了日を2023/03/15に設定
+  scheduleManager.setStartTask("004", "108", "2023-03-15");
+  scheduleManager.setEndTask("004", "108", "2023-03-15");
 
-//  期限内に終えられたスケジュール一覧を出力
-let successfulSchedules = scheduleManager.getSuccessfulSchedules();
-console.log("期限内に終えられたスケジュール一覧 ----------------");
-for (let i = 0; i < successfulSchedules.length; i++) {
-  console.log(successfulSchedules[i].toString());
+  //  期限内に終えられたスケジュール一覧を出力
+  let successfulSchedules = scheduleManager.getSuccessfulSchedules();
+  console.log("期限内に終えられたスケジュール一覧 ----------------");
+  for (let i = 0; i < successfulSchedules.length; i++) {
+    console.log(successfulSchedules[i].toString());
+  }
+  console.log("");
+
+  //  期限内に終えられたタスク一覧を出力
+  let successfulTasks = scheduleManager.getSuccessfulTasks();
+  console.log("期限内に終えられたタスク一覧 ----------------");
+  for (let i = 0; i < successfulTasks.length; i++) {
+    console.log(successfulTasks[i].toString());
+  }
 }
-console.log("");
 
-//  期限内に終えられたタスク一覧を出力
-let successfulTasks = scheduleManager.getSuccessfulTasks();
-console.log("期限内に終えられたタスク一覧 ----------------");
-for (let i = 0; i < successfulTasks.length; i++) {
-  console.log(successfulTasks[i].toString());
-}
+main();

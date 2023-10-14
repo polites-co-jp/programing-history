@@ -132,35 +132,30 @@ class Schedule extends TaskBase {
    * 開始日
    */
   get startDate() {
-
-    
-    return this.#_tasks.some(t => !t.startDate) ? null : 
-      this.tasks.reduce(
-        (maxDate, t) =>
-          !maxDate || (t.startDate && maxDate < t.startDate)
-            ? t.startDate
-            : maxDate,
-        null
-      )
-
+    return this.#_tasks.some((t) => !t.startDate)
+      ? null
+      : this.tasks.reduce(
+          (maxDate, t) =>
+            !maxDate || (t.startDate && maxDate < t.startDate)
+              ? t.startDate
+              : maxDate,
+          null
+        );
   }
 
   /**
    * 終了日
    */
   get endDate() {
-
-    // console.log("flag: " + this.#_tasks.some(t => !t.endDate))
-    // console.log(this.#_tasks.map(t => t.endDate))
-
-    return this.#_tasks.some(t => !t.endDate) ? null : 
-      this.tasks.reduce(
-        (maxDate, t) =>
-          !maxDate || (t.endDate && maxDate < t.endDate)
-            ? t.endDate
-            : maxDate,
-        null
-      )
+    return this.#_tasks.some((t) => !t.endDate)
+      ? null
+      : this.tasks.reduce(
+          (maxDate, t) =>
+            !maxDate || (t.endDate && maxDate < t.endDate)
+              ? t.endDate
+              : maxDate,
+          null
+        );
   }
 
   /**
@@ -303,21 +298,20 @@ class Task extends TaskBase {
           id: idOrTask.id,
           name: idOrTask.name,
           scheduleId: idOrTask.scheduleId,
-          planStartDate:  df.formatDate(idOrTask.planStartDate, '-'),
-          planEndDate:    df.formatDate(idOrTask.planEndDate, '-'),
-          startDate:      df.formatDate(idOrTask.startDate, '-'),
-          endDate:        df.formatDate(idOrTask.endDate, '-'),
+          planStartDate: df.formatDate(idOrTask.planStartDate, "-"),
+          planEndDate: df.formatDate(idOrTask.planEndDate, "-"),
+          startDate: df.formatDate(idOrTask.startDate, "-"),
+          endDate: df.formatDate(idOrTask.endDate, "-"),
         }
       : {
           id: idOrTask,
           name,
           scheduleId,
-          planStartDate : df.formatDate(planStartDate, '-'),
-          planEndDate : df.formatDate(planEndDate, '-'),
-          startDate : df.formatDate(startDate, '-'),
-          endDate : df.formatDate(endDate, '-'),
+          planStartDate: df.formatDate(planStartDate, "-"),
+          planEndDate: df.formatDate(planEndDate, "-"),
+          startDate: df.formatDate(startDate, "-"),
+          endDate: df.formatDate(endDate, "-"),
         };
-
 
     super(initValue.id, initValue.name);
 
@@ -383,7 +377,7 @@ class ScheduleManager {
       this.#_schedules = scheduleCsvOrSchedules;
     } else {
       const tasks = this.#parseTaskCsv(taskCsv);
-      const schedules = this.#parseScheduleCsv(scheduleCsv, tasks);
+      const schedules = this.#parseScheduleCsv(scheduleCsvOrSchedules, tasks);
 
       this.#_schedules = schedules;
     }
@@ -462,7 +456,7 @@ class ScheduleManager {
    */
   getSuccessfulTasks() {
     return this.#_schedules
-      .map(s =>{
+      .map((s) => {
         return s.tasks.filter((t) => t.isSuccess);
       })
       .flat();
@@ -477,10 +471,10 @@ class ScheduleManager {
    * @param {*} startDate
    */
   setStartTask(scheduleId, taskId, startDate) {
-
     const newSchedules = this.#_schedules.map((s) =>
       s.id === scheduleId ? s.setStartTask(taskId, startDate) : s
-    );5
+    );
+    5;
     return new ScheduleManager(newSchedules);
   }
 
@@ -491,7 +485,6 @@ class ScheduleManager {
    * @param {*} endDate
    */
   setEndTask(scheduleId, taskId, endDate) {
-
     const newSchedules = this.#_schedules.map((s) =>
       s.id === scheduleId ? s.setEndTask(taskId, endDate) : s
     );
@@ -499,47 +492,49 @@ class ScheduleManager {
   }
 }
 
-const scheduleCsv = df.getSheduleCsvData();
-const taskCsv = df.getTaskCsvData();
+function main() {
+  const scheduleCsv = df.getSheduleCsvData();
+  const taskCsv = df.getTaskCsvData();
 
-const scheduleManager = new ScheduleManager(scheduleCsv, taskCsv);
+  const scheduleManager = new ScheduleManager(scheduleCsv, taskCsv);
 
-const setStartedManager = scheduleManager.setStartTask(
-  "004",
-  "108",
-  "2023-03-15"
-);
-const setEndedManager = setStartedManager.setEndTask(
-  "004",
-  "108",
-  "2023-03-15"
-);
+  const setStartedManager = scheduleManager.setStartTask(
+    "004",
+    "108",
+    "2023-03-15"
+  );
+  const setEndedManager = setStartedManager.setEndTask(
+    "004",
+    "108",
+    "2023-03-15"
+  );
 
-console.log("期限内に終えられたスケジュール一覧 ----------------");
-setEndedManager
-  .getSuccessfulSchedules()
-  .forEach((schedule) => console.log(schedule.toString()));
+  console.log("期限内に終えられたスケジュール一覧 ----------------");
+  setEndedManager
+    .getSuccessfulSchedules()
+    .forEach((schedule) => console.log(schedule.toString()));
 
   console.log("");
-  
-console.log("期限内に終えられたタスク一覧 ----------------");
-setEndedManager
-  .getSuccessfulTasks()
-  .forEach((task) => console.log(task.toString()));
+
+  console.log("期限内に終えられたタスク一覧 ----------------");
+  setEndedManager
+    .getSuccessfulTasks()
+    .forEach((task) => console.log(task.toString()));
 
   // console.log("");
   // console.log("");
-
 
   // console.log("期限内に終えられたスケジュール一覧 ----------------");
   // scheduleManager
   //   .getSuccessfulSchedules()
   //   .forEach((schedule) => console.log(schedule.toString()));
-  
+
   //   console.log("");
-    
+
   // console.log("期限内に終えられたタスク一覧 ----------------");
   // scheduleManager
   //   .getSuccessfulTasks()
   //   .forEach((task) => console.log(task.toString()));
-  
+}
+
+main();
