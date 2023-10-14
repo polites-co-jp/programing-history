@@ -459,6 +459,20 @@ class ScheduleManager {
   }
 }
 
+/**
+ * 文字列配列をconsole.logする
+ * @param {*} texts
+ */
+function consoleLogArray(texts) {
+  //  取得したスケジュールを出力
+  for (let i = 0; i < texts.length; i++) {
+    if(!!texts[i].toString)
+      console.log(texts[i].toString())
+    else
+      console.log(texts[i]);
+  }
+}
+
 function main() {
   //  CSVのデータを取得
   let scheduleCsv = df.getSheduleCsvData();
@@ -474,17 +488,15 @@ function main() {
   //  期限内に終えられたスケジュール一覧を出力
   let successfulSchedules = scheduleManager.getSuccessfulSchedules();
   console.log("期限内に終えられたスケジュール一覧 ----------------");
-  for (let i = 0; i < successfulSchedules.length; i++) {
-    console.log(successfulSchedules[i].toString());
-  }
+  consoleLogArray(successfulSchedules)
+  
   console.log("");
 
   //  期限内に終えられたタスク一覧を出力
   let successfulTasks = scheduleManager.getSuccessfulTasks();
   console.log("期限内に終えられたタスク一覧 ----------------");
-  for (let i = 0; i < successfulTasks.length; i++) {
-    console.log(successfulTasks[i].toString());
-  }
+  consoleLogArray(successfulTasks)
+  
 }
 
 main();

@@ -71,7 +71,7 @@ function getMinPlanStart(tasks) {
 }
 
 /**
- * 終了予定日の最も古いのを取得
+ * 終了予定日の最も新しいのを取得
  * @param {*} tasks
  */
 function getMaxPlanEnd(tasks) {
@@ -105,7 +105,7 @@ function getMinStart(tasks) {
 }
 
 /**
- * 終了の最も古いのを取得
+ * 終了の最も新しいのを取得
  * @param {*} tasks
  */
 function getMaxEnd(tasks) {
@@ -129,8 +129,9 @@ function getMaxEnd(tasks) {
 function getSchedulesTasks(schedule, tasks) {
   let result = [];
   for (let i = 0; i < tasks.length; i++) {
-    if (schedule[scheduleIdIdx] === tasks[i][taskScheduleIdIdx])
-      result.push(tasks[i]);
+    if (schedule[scheduleIdIdx] !== tasks[i][taskScheduleIdIdx]) continue;
+
+    result.push(tasks[i]);
   }
   return result;
 }
@@ -163,9 +164,9 @@ function isScheduleSuccess(schedule, tasks) {
 function getSuccessSchedules(schedules, tasks) {
   let result = [];
   for (let i = 0; i < schedules.length; i++) {
-    if (isScheduleSuccess(schedules[i], tasks)) {
-      result.push(schedules[i]);
-    }
+    if (!isScheduleSuccess(schedules[i], tasks)) continue;
+
+    result.push(schedules[i]);
   }
   return result;
 }
@@ -203,15 +204,17 @@ function getOutputTextBySchedules(schedules, tasks) {
   return result;
 }
 
-
-
 /**
- * タスクが正常終了したとき
+ * タスクが正常終了したかどうかの判定
  * @param {*} tasks
  */
-function isTaskSuccess( task) {
-
-  if(!task[taskStartPlanDateIdx] || !task[taskEndPlanDateIdx] || !task[taskStartDateIdx]|| !task[taskEndDateIdx])
+function isTaskSuccess(task) {
+  if (
+    !task[taskStartPlanDateIdx] ||
+    !task[taskEndPlanDateIdx] ||
+    !task[taskStartDateIdx] ||
+    !task[taskEndDateIdx]
+  )
     return false;
 
   if (task[taskEndDateIdx] > task[taskEndPlanDateIdx]) return false;
@@ -219,47 +222,53 @@ function isTaskSuccess( task) {
   return true;
 }
 
-
 /**
  * 期限内に完了したタスクを取得
  * @param {*} tasks
  */
 function getSuccessTasks(tasks) {
-
-  let result = []
-  for(let i = 0; i < tasks.length; i++){
-    if(isTaskSuccess(tasks[i]))
-      result.push(tasks[i])
-  }
-  return result
-}
-
-/**
- * taskから、出力するための文字列を取得する
- * @param {*} task 
- */
-function getOutputTextByTask(task){
-
-
-  return `予定:${df.formatDate(task[taskStartPlanDateIdx])}-${df.formatDate(task[taskEndPlanDateIdx]
-  )} / 実績:${df.formatDate(task[taskStartDateIdx])}-${df.formatDate(task[taskEndDateIdx])}　${
-    task[taskNameIdx]
-  }`;
-}
-
-/**
- * taskから、出力するための文字列を取得する
- * @param {*} task 
- */
-function getOutputTextByTasks(tasks){
-
-  let result = []
-  for(let i = 0; i < tasks.length; i++){
-      result.push(getOutputTextByTask( tasks[i]))
+  let result = [];
+  for (let i = 0; i < tasks.length; i++) {
+    if (!isTaskSuccess(tasks[i])) continue;
+    result.push(tasks[i]);
   }
   return result;
 }
 
+/**
+ * taskから、出力するための文字列を取得する
+ * @param {*} task
+ */
+function getOutputTextByTask(task) {
+  return `予定:${df.formatDate(task[taskStartPlanDateIdx])}-${df.formatDate(
+    task[taskEndPlanDateIdx]
+  )} / 実績:${df.formatDate(task[taskStartDateIdx])}-${df.formatDate(
+    task[taskEndDateIdx]
+  )}　${task[taskNameIdx]}`;
+}
+
+/**
+ * taskから、出力するための文字列を取得する
+ * @param {*} task
+ */
+function getOutputTextByTasks(tasks) {
+  let result = [];
+  for (let i = 0; i < tasks.length; i++) {
+    result.push(getOutputTextByTask(tasks[i]));
+  }
+  return result;
+}
+
+/**
+ * 文字列配列をconsole.logする
+ * @param {*} texts
+ */
+function consoleLogArray(texts) {
+  //  取得したスケジュールを出力
+  for (let i = 0; i < texts.length; i++) {
+    console.log(texts[i]);
+  }
+}
 
 function mian() {
   //  CSVのデータを取得 ========================
@@ -274,6 +283,8 @@ function mian() {
   setTaskStartDate(taskData, "108", "2023-03-15");
   setTaskEndDate(taskData, "108", "2023-03-15");
 
+  console.log("期限内に終えられたスケジュール一覧 ----------------");
+
   //  期限内に終えられたスケジュールを取得
   let successSchedules = getSuccessSchedules(scheduleData, taskData);
   //  対象のスケジュールの出力用文字列を取得
@@ -282,27 +293,19 @@ function mian() {
     taskData
   );
 
-  console.log("期限内に終えられたスケジュール一覧 ----------------");
-
   //  取得したスケジュールを出力
-  for(let i = 0; i < successSchedulesTexts.length; i++){
-    console.log(successSchedulesTexts[i]);
-  }
+  consoleLogArray(successSchedulesTexts);
 
   console.log("");
+  console.log("期限内に終えられたタスク一覧 ----------------");
 
   //  期限内に終えられたタスクを取得
   let successTasks = getSuccessTasks(taskData);
   //  対象のタスクの出力用文字列を取得
   let successTasksTexts = getOutputTextByTasks(successTasks);
 
-  console.log("期限内に終えられたタスク一覧 ----------------");
   //  取得したタスクを出力
-  for(let i = 0; i < successTasksTexts.length; i++){
-    console.log(successTasksTexts[i]);
-  }
-
-
+  consoleLogArray(successTasksTexts);
 }
 
 mian();
