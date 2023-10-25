@@ -15,7 +15,7 @@ const setTask108Date = () => {
   const results = [];
 
   // taskのCSVをMapに変換
-  const taskMap = taskCsv2Map(getTaskCsvData());
+  const taskMap = csv2Map(getTaskCsvData(), taskHeader);
 
   // 開始日と終了日を設定する処理呼び出し
   const updateTaskMap = setStartEndDate(taskMap, "108", startDate, endDate);
@@ -46,6 +46,11 @@ const setStartEndDate = (mapData, setId, startDate, endDate) => {
   target.startDate = formatDate(startDate, "-");
   target.endDate = formatDate(endDate, "-");
 
+  
+  console.log('+-----------')
+  console.log(mapData.get(setId))
+  console.log(target)
+
   // Mapに設定
   mapData.set(setId, target);
 
@@ -59,10 +64,10 @@ const setStartEndDate = (mapData, setId, startDate, endDate) => {
  */
 const getCompletedSchedulesWithinDeadline = () => {
   // ScheduleのCSVをMapに変換
-  const scheduleMap = scheduleCsv2Map(getSheduleCsvData());
+  const scheduleMap = csv2Map(getSheduleCsvData(), scheduleHeader);
 
   // TaskのCSVをMapに変換
-  const taskMap = taskCsv2Map(getTaskCsvData());
+  const taskMap = csv2Map(getTaskCsvData(), taskHeader);
 
   // 結果リスト
   const results = [];
@@ -147,7 +152,7 @@ const getCompletedSchedulesWithinDeadline = () => {
  */
 const getCompletedTasksWithinDeadline = () => {
   // TaskのCSVをMapに変換
-  const taskMap = taskCsv2Map(getTaskCsvData());
+  const taskMap = csv2Map(getTaskCsvData(), taskHeader);
 
   // 結果リスト
   const results = [];
@@ -174,23 +179,61 @@ const getCompletedTasksWithinDeadline = () => {
 
 // *************課題用共通処理
 
-/**
- * タスクCSVをMap（key:id,value:taskレコード）に変換する
- */
-const taskCsv2Map = (csv) => {
-  const resultMap = new Map();
-  // 改行コードで分割
-  const lines = csv.split("\n");
-  lines.forEach((line) => {
-    // カンマで分割
-    let cells = line.split(",");
-    const tmp = {};
-    cells.forEach((cell, index) => {
-      tmp[taskHeader[index]] = cell;
-    });
-    resultMap.set(tmp.id, tmp);
-  });
-  return resultMap;
+// /**
+//  * タスクCSVをMap（key:id,value:taskレコード）に変換する
+//  */
+// const csv2Map = (c, taskHeadersv) => {
+//   const resultMap = new Map();
+//   // 改行コードで分割
+//   const lines = csv.split("\n");
+//   lines.forEach((line) => {
+//     // カンマで分割
+//     let cells = line.split(",");
+//     const tmp = {};
+//     cells.forEach((cell, index) => {
+//       tmp[taskHeader[index]] = cell;
+//     });
+//     resultMap.set(tmp.id, tmp);
+//   });
+//   return resultMap;
+// };
+
+const csv2Map = (csv, headList) => {
+  return new Map(
+    csv
+      .split("\n")
+      .map((line) =>
+        line.split(",").reduce(
+          (res, item, idx) => ({
+            ...res,
+            [headList[idx]]: item,
+          }),
+          {}
+        )
+      )
+      .map((item) => [item.id, item])
+  );
+};
+
+const csv2MapVer2 = (csv, headList) => {
+  return csv
+    .split("\n")
+    .map((line) =>
+      line.split(",").reduce(
+        (res, item, idx) => ({
+          ...res,
+          [headList[idx]]: item,
+        }),
+        {}
+      )
+    )
+    .reduce(
+      (res, item) => ({
+        ...res,
+        [item.id]: item,
+      }),
+      {}
+    );
 };
 
 /**
